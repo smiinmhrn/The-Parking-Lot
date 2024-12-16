@@ -32,8 +32,6 @@ def park_cars(car_id, parking):
     parking["parking_capacity"].acquire()
 
     for floor_index, floor_semaphore in enumerate(parking["floor_capacity"]):
-        if floor_index != 0: time.sleep(1)
-
         if floor_semaphore.acquire(blocking=False):
             for spot_index, spot_semaphore in enumerate(parking["spots_each_floor"][floor_index]):
                 if spot_semaphore.acquire(blocking=False):
@@ -49,6 +47,8 @@ def park_cars(car_id, parking):
                     time.sleep(1)  # Simulate leaving time
                     spot_semaphore.release()
                     floor_semaphore.release()
+
+                    time.sleep(floor_index)
                     parking["parking_capacity"].release()
                     log(f"Car {car_id} has left the parking lot.", parking["lock"])
 
@@ -56,6 +56,7 @@ def park_cars(car_id, parking):
         else:
             log(f"Car {car_id} could not find a valid spot on floor {floor_index}.", parking["lock"])
             log(f"Car {car_id} is moving to floor {floor_index + 1}.", parking["lock"])
+            time.sleep(1)
 
 #for running the programe
 def main():
